@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How long are you going to live?</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>How long are you going to live?</h1>
+    <form id="life-tracker-form">
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required>
+        <br>
+        <label for="lifespan">Desired Lifespan (in years):</label>
+        <input type="number" id="lifespan" name="lifespan" placeholder="72 (Life Expectancy by WHO)">
+        <br>
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        document.getElementById('dob').addEventListener('focus', function() {
+            this.click(); // Opens the date picker when the input gains focus
+        });
+
+        document.getElementById('life-tracker-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const dobInput = document.getElementById('dob').value;
+            const dob = new Date(dobInput);
+            const currentDate = new Date();
+            let lifespan = document.getElementById('lifespan').value;
+            lifespan = lifespan ? parseInt(lifespan, 10) : 72; // Default to 72 if input is empty
+    
+            // Check if DOB is in the future
+            if (dob > currentDate) {
+                alert('Error: Date of Birth cannot be in the future.');
+                return;
+            }
+    
+            // Calculate the end date based on the user's input
+            const endDate = new Date(dob);
+            endDate.setFullYear(dob.getFullYear() + lifespan);
+    
+            // Clear any existing interval before starting a new one
+            if (window.timerInterval) {
+                clearInterval(window.timerInterval);
+            }
+    
+            function updateCountdown() {
+                const currentDate = new Date();
+                let timeDiff = endDate - currentDate;
+    
+                if (timeDiff <= 0) {
+                    document.getElementById('result').innerText = 'Time is up!';
+                    clearInterval(window.timerInterval);
+                    return;
+                }
+    
+                const totalSeconds = Math.floor(timeDiff / 1000);
+                const years = Math.floor(totalSeconds / (3600 * 24 * 365));
+                const months = Math.floor((totalSeconds % (3600 * 24 * 365)) / (3600 * 24 * 30));
+                const weeks = Math.floor((totalSeconds % (3600 * 24 * 30)) / (3600 * 24 * 7));
+                const days = Math.floor((totalSeconds % (3600 * 24 * 7)) / (3600 * 24));
+                const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+    
+                // Update the result display with the live countdown
+                document.getElementById('result').innerText = `${years} years, ${months} months, ${weeks} weeks, ${days} days, ${hours} hours, ${minutes} mins & ${seconds} secs is all you got!`;
+            }
+    
+            // Update the countdown immediately and set an interval to update it every second
+            updateCountdown();
+            window.timerInterval = setInterval(updateCountdown, 1000);
+        });
+    </script>        
+</body>
+</html>
